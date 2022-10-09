@@ -33,10 +33,31 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { useEffect } from 'react';
+import { createStore } from './data/ionicStorage';
 
 setupIonicReact();
 
-const App: React.FC = () => (
+const App: React.FC = () => {
+  useEffect(() => {
+
+		const setupStore = async () => {
+      console.log('setting up store');
+
+			await createStore("workout");
+			// const exists = await get("msgs");
+
+			// if (!exists) {
+				
+			// 	const msgs = getMessages();
+			// 	set("msgs", msgs);
+			// }
+		}
+
+		setupStore();
+	}, []);
+  
+  return (
   <IonApp>
     <IonReactRouter>
       <IonTabs>
@@ -57,20 +78,20 @@ const App: React.FC = () => (
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
             <IonIcon icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
+            <IonLabel>Add Workout</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2">
             <IonIcon icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
+            <IonLabel>Add Exercise</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab3" href="/tab3">
             <IonIcon icon={square} />
-            <IonLabel>Tab 3</IonLabel>
+            <IonLabel>Record Workout</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>
   </IonApp>
 );
-
+  }
 export default App;
