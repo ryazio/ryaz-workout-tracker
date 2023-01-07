@@ -35,63 +35,67 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import { useEffect } from 'react';
 import { createStore } from './data/ionicStorage';
+import WorkoutHistory from './pages/WorkoutHistory';
 
 setupIonicReact();
 
 const App: React.FC = () => {
   useEffect(() => {
 
-		const setupStore = async () => {
+    const setupStore = async () => {
       console.log('setting up store');
 
-			await createStore("workout");
-			// const exists = await get("msgs");
+      await createStore("workout");
+      // const exists = await get("msgs");
 
-			// if (!exists) {
-				
-			// 	const msgs = getMessages();
-			// 	set("msgs", msgs);
-			// }
-		}
+      // if (!exists) {
 
-		setupStore();
-	}, []);
-  
+      // 	const msgs = getMessages();
+      // 	set("msgs", msgs);
+      // }
+    }
+
+    setupStore();
+  }, []);
+
   return (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
-          </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <Tab3 />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/tab1" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon icon={triangle} />
-            <IonLabel>Add Workout</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon icon={ellipse} />
-            <IonLabel>Add Exercise</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon icon={square} />
-            <IonLabel>Record Workout</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
-  }
+    <IonApp>
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/tab1">
+              <Tab1 />
+            </Route>
+            <Route exact path="/tab2">
+              <Tab2 />
+            </Route>
+            <Route path="/tab3">
+              <Tab3 />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/tab1" />
+            </Route>
+            <Route exact path="/history">
+              <WorkoutHistory />
+            </Route>
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="tab1" href="/tab1">
+              <IonIcon icon={triangle} />
+              <IonLabel>Add Workout</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab2" href="/tab2">
+              <IonIcon icon={ellipse} />
+              <IonLabel>Add Exercise</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab3" href="/tab3">
+              <IonIcon icon={square} />
+              <IonLabel>Record Workout</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+}
 export default App;

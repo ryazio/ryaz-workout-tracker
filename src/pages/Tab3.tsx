@@ -1,4 +1,5 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonLabel, IonNavLink, IonPage, IonRouterLink, IonTitle, IonToolbar } from '@ionic/react';
+import { Link } from 'react-router-dom';
 import RecordWorkout from '../components/RecordWorkout';
 // import ExploreContainer from '../components/ExploreContainer';
 import './Tab3.css';
@@ -9,6 +10,14 @@ const Tab3: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Record Workout</IonTitle>
+          {/* <IonLabel> */}
+          {/* <a href="/history">
+
+</a> */}
+          <IonRouterLink href='/history'>
+            History
+          </IonRouterLink>
+          {/* </IonLabel> */}
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
