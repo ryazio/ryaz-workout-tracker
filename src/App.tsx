@@ -33,13 +33,15 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createStore } from './data/ionicStorage';
 import WorkoutHistory from './pages/WorkoutHistory';
 
 setupIonicReact();
 
 const App: React.FC = () => {
+  const [currentSession, setCurrentSession] = useState({});
+
   useEffect(() => {
 
     const setupStore = async () => {
@@ -70,7 +72,7 @@ const App: React.FC = () => {
               <Tab2 />
             </Route>
             <Route path="/tab3">
-              <Tab3 />
+              <Tab3 currentSession={currentSession} setCurrentSession={setCurrentSession} />
             </Route>
             <Route exact path="/">
               <Redirect to="/tab1" />

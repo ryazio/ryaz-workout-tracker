@@ -1,10 +1,15 @@
-import { IonButton, IonContent, IonHeader, IonLabel, IonNavLink, IonPage, IonRouterLink, IonTitle, IonToolbar } from '@ionic/react';
-import { Link } from 'react-router-dom';
-import RecordWorkout from '../components/RecordWorkout';
+import { IonContent, IonHeader, IonPage, IonRouterLink, IonTitle, IonToolbar } from '@ionic/react';
+import RecordWorkout2 from '../components/RecordWorkout2';
 // import ExploreContainer from '../components/ExploreContainer';
 import './Tab3.css';
 
-const Tab3: React.FC = () => {
+interface TabProps {
+  currentSession: object,
+  setCurrentSession: React.Dispatch<React.SetStateAction<object>>
+};
+
+const Tab3: React.FC<TabProps> = (props: TabProps) => {
+  const { currentSession, setCurrentSession } = props;
   return (
     <IonPage>
       <IonHeader>
@@ -27,7 +32,7 @@ const Tab3: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         {/* <ExploreContainer name="Tab 3 page" /> */}
-        <RecordWorkout />
+        <RecordWorkout2 currentSession={currentSession} setCurrentSession={setCurrentSession} />
       </IonContent>
     </IonPage>
   );
