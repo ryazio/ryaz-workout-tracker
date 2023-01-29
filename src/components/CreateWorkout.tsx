@@ -4,7 +4,8 @@ import { IonButton, IonInput } from '@ionic/react';
 import { get, set } from '../data/ionicStorage';
 
 interface workout {
-  name: string
+  name: string,
+  id: number
 }
 
 const CreateWorkout = () => {
@@ -45,13 +46,12 @@ const CreateWorkout = () => {
       })} */}
         {/* {workouts[0].name} */}
         {
-          workouts.map((workout) => {
-            return (
-              <div>
-                {workout.name}
-              </div>
-            )
-          })
+          workouts.map((workout) => (
+            <div key={workout.id}>
+              {workout.name}
+            </div>
+          )
+          )
         }
       </div>
     </div>
