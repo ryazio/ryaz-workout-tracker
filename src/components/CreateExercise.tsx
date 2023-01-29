@@ -19,7 +19,7 @@ const CreateExercise = () => {
   const fetchWorkoutData = async () => {
     const workoutData = await get('workouts');
     const exerciseData = await get('exercises');
-    console.log('fetching workouts..', workoutData);
+    console.log('fetching workouts..', workoutData, exerciseData);
     if (!workoutData.length) {
       set('workouts', []);
       setWorkouts([]);
@@ -27,8 +27,9 @@ const CreateExercise = () => {
     else {
       setWorkouts(workoutData);
     }
-    if (!exerciseData.length) {
+    if (!exerciseData?.length) {
       set('exercises', []);
+      setExercises([]);
     }
     else {
       setExercises(exerciseData);
@@ -56,32 +57,32 @@ const CreateExercise = () => {
   return (
     <div>
       <IonList>
-      <IonItem>
-        <IonSelect interface="action-sheet" placeholder="Select Workout"
-        onIonChange={(e) =>  setSelectedWorkout(e.detail.value)}
-        >
-          {workouts.map((workout: any) => {
-            return (<div key={workout.id}>
-              <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
-            </div>);
-          })}
-        </IonSelect>
-      </IonItem>
-    </IonList>
+        <IonItem>
+          <IonSelect interface="action-sheet" placeholder="Select Workout"
+            onIonChange={(e) => setSelectedWorkout(e.detail.value)}
+          >
+            {workouts.map((workout: any) => {
+              return (<div key={workout.id}>
+                <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
+              </div>);
+            })}
+          </IonSelect>
+        </IonItem>
+      </IonList>
       <IonLabel>Exercise</IonLabel>
       <IonInput value={exerciseName} placeholder="Enter Exercise name" onIonChange={e => setExerciseName(e.detail.value!)} clearInput></IonInput>
       <IonInput value={exerciseSets} placeholder="Enter Sets" onIonChange={e => setExerciseSets(e.detail.value!)} clearInput></IonInput>
       <IonInput value={exerciseReps} placeholder="Enter Reps" onIonChange={e => setExerciseReps(e.detail.value!)} clearInput></IonInput>
       <IonButton onClick={storeExercise}>Save</IonButton>
       <div>
-      {/* {workouts[0].name} */}
+        {/* {workouts[0].name} */}
       </div>
     </div>
   );
 };
 
 CreateExercise.propTypes = {
-  
+
 };
 
 export default CreateExercise;

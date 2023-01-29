@@ -19,9 +19,9 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
   const [filteredExercises, setFilteredExercises] = useState([]);
 
   const fn = async () => {
-    setWorkoutData(await get('workouts'));
-    setExerciseData(await get('exercises'));
-    setWorkoutRecordData(await get('workoutRecords'));
+    setWorkoutData(await get('workouts') || []);
+    setExerciseData(await get('exercises') || []);
+    setWorkoutRecordData(await get('workoutRecords') || []);
   };
 
   const filterExercise = (workoutId: string) => {
