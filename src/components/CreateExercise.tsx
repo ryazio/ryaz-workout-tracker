@@ -37,7 +37,9 @@ const CreateExercise = () => {
   }
   const storeExercise = async () => {
     console.log('storing exercise');
-    await set('exercises', [...exercises, {
+    // fetching again as it was getting overriden with empty array []
+    const existingExercises = await get('exercises');
+    await set('exercises', [...existingExercises, {
       id,
       name: exerciseName,
       sets: exerciseSets,
