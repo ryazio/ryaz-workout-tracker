@@ -70,15 +70,20 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
     });
   }
 
-  const finishWorkout = () => {
+  const finishWorkout = async () => {
+    const history = await get('history') || [];
     console.log('Finish workout: ', currentSession);
-    const data = {
+    const currentSessionData = {
       id: sessionId,
       workoutId: selectedWorkout,
       data: currentSession,
       createdAt: new Date()
     }
-    set('history', data);
+    const appendedHistory = [
+      ...history,
+      currentSessionData
+    ];
+    set('history', appendedHistory);
     setSessionState(sessionStateEnum.finish);
     toast({
       message: 'Congratulations!',
@@ -94,97 +99,87 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
 
   return (
     <div>
-      {!(sessionState === sessionStateEnum.finish) ?
-        (
-          <div>
-            <h1>Record Workout</h1>
+      <h1>Record Workout</h1>
 
-            <IonSelect interface="action-sheet" placeholder="Select Workout"
-              onIonChange={(e) => {
-                setSelectedWorkout(e.detail.value);
-                // const filteredEx = filterExercise(e.detail.value);
-                // if (e?.detail?.value && filteredEx.length) {
-                //   createSession(e.detail.value, filteredEx);
-                // }
-              }}
-            >
-              {workoutData.map((workout: any) => {
-                return (<div key={workout.id}>
-                  <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
-                </div>);
-              })}
-            </IonSelect>
+      <IonSelect interface="action-sheet" placeholder="Select Workout"
+        onIonChange={(e) => {
+          setSelectedWorkout(e.detail.value);
+          filterExercise(e.detail.value);
+          // if (e?.detail?.value && filteredEx.length) {
+          //   createSession(e.detail.value, filteredEx);
+          // }
+        }}
+      >
+        {workoutData.map((workout: any) => {
+          return (<div key={workout.id}>
+            <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
+          </div>);
+        })}
+      </IonSelect>
 
-            {filteredExercises.map((exercise: any) => (
-              <IonAccordionGroup>
-                <IonAccordion value="first">
-                  <IonItem slot="header" color="light">
-                    <IonLabel>{exercise.name}</IonLabel>
-                  </IonItem>
-                  <div className="ion-padding" slot="content">
-                    {/* First Content */}
-                    {
-                      [...Array(Number(exercise.sets))].map((_, index) => (
-                        <IonRow>
-                          <IonCol col-4>
-                            <IonLabel>Set {index + 1}</IonLabel>
-                          </IonCol>
-                          <IonCol col-4>
-                            <IonLabel>
-                              <IonInput
-                                // value={exerciseName}
-                                placeholder="Weight for the set"
-                                min="1"
-                                max="1000"
-                                type="number"
-                                inputmode="numeric"
-                                onIonBlur={e => updateCurrentSession(exercise.id, index, e.target.value!, null)}
-                                clearInput>
-                              </IonInput>
+      {filteredExercises.map((exercise: any) => (
+        <IonAccordionGroup>
+          <IonAccordion value="first">
+            <IonItem slot="header" color="light">
+              <IonLabel>{exercise.name}</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              {/* First Content */}
+              {
+                [...Array(Number(exercise.sets))].map((_, index) => (
+                  <IonRow>
+                    <IonCol col-4>
+                      <IonLabel>Set {index + 1}</IonLabel>
+                    </IonCol>
+                    <IonCol col-4>
+                      <IonLabel>
+                        <IonInput
+                          // value={exerciseName}
+                          placeholder="Weight for the set"
+                          min="1"
+                          max="1000"
+                          type="number"
+                          inputmode="numeric"
+                          onIonBlur={e => updateCurrentSession(exercise.id, index, e.target.value!, null)}
+                          clearInput>
+                        </IonInput>
 
-                            </IonLabel>
-                          </IonCol>
-                          <IonCol col-4>
-                            <IonLabel>
-                              <IonInput
-                                placeholder='Reps for the set'
-                                min='0'
-                                max='1000'
-                                type='number'
-                                inputmode='numeric'
-                                onIonBlur={e => updateCurrentSession(exercise.id, index, null, e.target.value!)}
-                                clearInput
-                              >
+                      </IonLabel>
+                    </IonCol>
+                    <IonCol col-4>
+                      <IonLabel>
+                        <IonInput
+                          placeholder='Reps for the set'
+                          min='0'
+                          max='1000'
+                          type='number'
+                          inputmode='numeric'
+                          onIonBlur={e => updateCurrentSession(exercise.id, index, null, e.target.value!)}
+                          clearInput
+                        >
 
-                              </IonInput>
-                              {/* {exercise.reps} */}
-                            </IonLabel>
-                          </IonCol>
-                        </IonRow>
-                      ))
-                    }
-                  </div>
-                </IonAccordion>
-              </IonAccordionGroup>
-            ))
-            }
+                        </IonInput>
+                        {/* {exercise.reps} */}
+                      </IonLabel>
+                    </IonCol>
+                  </IonRow>
+                ))
+              }
+            </div>
+          </IonAccordion>
+        </IonAccordionGroup>
+      ))
+      }
 
-            {!!selectedWorkout && sessionState === sessionStateEnum.start &&
-              < IonButton onClick={setInitialSetData}>
-                Start
-              </IonButton>
-            }
-            {!([sessionStateEnum.finish, sessionStateEnum.start].includes(sessionState)) &&
-              <IonButton onClick={finishWorkout}>
-                Finish
-              </IonButton>
-            }
-          </div>
-        ) : (
-          <div>
-            <h1>Congratulations!</h1>
-          </div>
-        )
+      {!!selectedWorkout && sessionState === sessionStateEnum.start &&
+        < IonButton onClick={setInitialSetData}>
+          Start
+        </IonButton>
+      }
+      {!([sessionStateEnum.finish, sessionStateEnum.start].includes(sessionState)) &&
+        <IonButton onClick={finishWorkout}>
+          Finish
+        </IonButton>
       }
     </div>
   );
