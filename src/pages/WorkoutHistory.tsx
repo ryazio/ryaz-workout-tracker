@@ -1,10 +1,34 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+// import PropTypes from 'prop-types';
+import { get } from '../data/ionicStorage';
+import { IonAccordion, IonAccordionGroup, IonItem, IonLabel } from '@ionic/react';
 
-const WorkoutHistory = (props: any) => {
+
+interface WorkoutHistoryProps {}
+
+const WorkoutHistory = (props: WorkoutHistoryProps) => {
+  const [historyData, setHistoryData] = useState([]);
+  const loadData = async() => {
+    setHistoryData(await get('history') || []);
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
   return (
     <div>
-      Workout History
+      {historyData.length && historyData.map((workout: any) => (
+        <IonAccordionGroup key={workout.id}>
+          <IonAccordion value="first" >
+            <IonItem slot="header" color="light">
+              <IonLabel>{workout.createdAt.toString()}</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              {JSON.stringify(workout.data)}
+            </div>
+          </IonAccordion>
+        </IonAccordionGroup>
+      ))}
     </div>
   );
 };
