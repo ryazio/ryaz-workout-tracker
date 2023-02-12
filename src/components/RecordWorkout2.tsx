@@ -70,7 +70,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
       duration: 1500,
       position: 'bottom'
     });
-  }, []);
+  }, [filteredExercises, setCurrentSession, toast]);
 
   const finishWorkout = async () => {
     const history = await get('history') || [];
