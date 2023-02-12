@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { get, set } from '../data/ionicStorage';
-import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonInput, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption, useIonToast } from '@ionic/react';
+import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonInput, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption, useIonAlert, useIonToast } from '@ionic/react';
 import range from 'lodash.range';
 
 interface SessionProps {
@@ -16,8 +16,10 @@ enum sessionStateEnum {
 }
 
 const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
-  ;
   const [toast] = useIonToast();
+  const [presentAlert] = useIonAlert();
+  // const [roleMessage, setRoleMessage] = useState('');
+
 
   console.log('props: ', props);
   const { currentSession, setCurrentSession } = props;
@@ -53,7 +55,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
     // setCurrentSession(sessionCopy);
   }
 
-  const setInitialSetData = () => {
+  const setInitialSetData = useCallback(() => {
     const setsInitialData: any = {};
     filteredExercises.forEach((exercise: any) => {
       const sets = parseInt(exercise.sets);
@@ -68,7 +70,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
       duration: 1500,
       position: 'bottom'
     });
-  }
+  }, []);
 
   const finishWorkout = async () => {
     const history = await get('history') || [];
@@ -92,10 +94,37 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
     });
   }
 
+  const confirmStart = useCallback(() => {
+    presentAlert({
+      header: 'Do you want to start this workout?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {},
+        },
+        {
+          text: 'Yes',
+          role: 'confirm',
+          handler: () => {
+            setInitialSetData();
+          },
+        },
+      ],
+      // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
+    })
+  }, [presentAlert, setInitialSetData]);
+
   useEffect(() => {
     fn();
   }, []);
   // console.log('all Data', workoutData, exerciseData);
+
+  useEffect(() => {
+    if(selectedWorkout) {
+      confirmStart();
+    }
+  }, [selectedWorkout, confirmStart]);
 
   return (
     <div>
