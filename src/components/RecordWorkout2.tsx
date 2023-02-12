@@ -135,7 +135,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
                       <IonLabel>
                         <IonInput
                           // value={exerciseName}
-                          placeholder="Weight for the set"
+                          placeholder="Weight"
                           min="1"
                           max="1000"
                           type="number"
@@ -149,7 +149,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
                     <IonCol col-4>
                       <IonLabel>
                         <IonInput
-                          placeholder='Reps for the set'
+                          placeholder='Reps'
                           min='0'
                           max='1000'
                           type='number'

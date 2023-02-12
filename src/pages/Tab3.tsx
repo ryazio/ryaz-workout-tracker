@@ -19,9 +19,9 @@ const Tab3: React.FC<TabProps> = (props: TabProps) => {
           {/* <a href="/history">
 
 </a> */}
-          <IonRouterLink href='/history'>
+          {/* <IonRouterLink href='/history'>
             History
-          </IonRouterLink>
+          </IonRouterLink> */}
           {/* </IonLabel> */}
         </IonToolbar>
       </IonHeader>

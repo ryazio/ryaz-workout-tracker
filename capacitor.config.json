@@ -1,5 +1,5 @@
 {
-	"appId": "io.ionic.starter",
+	"appId": "com.ryazio.workout",
 	"appName": "Workout Tracker",
 	"webDir": "build",
 	"bundledWebRuntime": false
