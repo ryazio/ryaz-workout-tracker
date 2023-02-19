@@ -1,216 +1,214 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
-import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonGrid, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption } from '@ionic/react';
 import { get, set } from '../data/ionicStorage';
+import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonContent, IonInput, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption, useIonAlert, useIonToast } from '@ionic/react';
+import range from 'lodash.range';
 
-interface workout {
-  name: string
+interface SessionProps {
+  currentSession: object,
+  setCurrentSession: React.Dispatch<React.SetStateAction<object>>
+};
+
+enum sessionStateEnum {
+  start,
+  wip,
+  finish
 }
 
-// {
-//   workout: "",
-//   creationDate: "",
-//   exercise: [{
-//     id: '',
-//     set1: { weight: 10, reps: 12 },
-//     set2: { weight: 15, reps: 12 },
-//     set3: { weight: 20, reps: 12 },
-//   }
-//   ]
-// }
+const RecordWorkout: React.FC<SessionProps> = (props: SessionProps) => {
+  const [toast] = useIonToast();
+  const [presentAlert] = useIonAlert();
+  // const [roleMessage, setRoleMessage] = useState('');
 
-interface workoutRecordExercise {
-  id: string,
-  setId: number,
-  weight: string,
-  reps: string
-}
 
-interface workoutRecord {
-  workoutId: string,
-  creationDate: Date,
-  exercise: Array<workoutRecordExercise> | []
-}
+  console.log('props: ', props);
+  const { currentSession, setCurrentSession } = props;
+  const [workoutData, setWorkoutData] = useState([]);
+  const [exerciseData, setExerciseData] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState('');
+  const [filteredExercises, setFilteredExercises] = useState([]);
+  const sessionId = Math.floor(10000 + Math.random() * 900000);
+  const [sessionState, setSessionState] = useState(sessionStateEnum.start);
 
-const RecordWorkout = () => {
-  const [exercises, setExercises] = useState<Array<object>>([]);
-  const [selectedWorkout, setSelectedWorkout] = useState<string>("");
-  const [exerciseName, setExerciseName] = useState<string>("");
-  const [exerciseSets, setExerciseSets] = useState<string>("");
-  const [exerciseReps, setExerciseReps] = useState<string>("");
-  const [workouts, setWorkouts] = useState<Array<workout>>([]);
-  const [allWorkoutRecord, setAllWorkoutRecord] = useState<Array<workoutRecord>>();
-  const [workoutRecord, setWorkoutRecord] = useState<workoutRecord>();
+  const fn = async () => {
+    setWorkoutData(await get('workouts') || []);
+    setExerciseData(await get('exercises') || []);
+  };
 
-  const filteredExercises = exercises.filter((exercise: any) => exercise.workout === selectedWorkout);
-
-  const fetchWorkoutData = async () => {
-    const workoutData = await get('workouts');
-    const exerciseData = await get('exercises');
-    const workoutRecordData = await get('workoutRecords');
-    console.log('fetching workouts..', workoutData);
-    if (!workoutData.length) {
-      set('workouts', []);
-      setWorkouts([]);
-    }
-    else {
-      setWorkouts(workoutData);
-    }
-    if (!exerciseData.length) {
-      set('exercises', []);
-    }
-    else {
-      setExercises(exerciseData);
-    }
-    if (!workoutRecordData.length) {
-      set('workoutRecords', []);
-    }
+  const filterExercise = (workoutId: string) => {
+    const result = exerciseData.filter((exercise: any) => exercise.workout === workoutId);
+    setFilteredExercises(result);
+    return result;
   }
-  const storeExercise = async () => {
-    console.log('storing exercise');
-    await set('exercises', [...exercises, {
-      name: exerciseName,
-      sets: exerciseSets,
-      reps: exerciseReps,
-      workout: selectedWorkout,
-    }]);
-    setExerciseName("");
-    setExerciseSets("");
-    setExerciseReps("");
-    // fetchWorkoutData();
+
+  const updateCurrentSession = (exerciseId: number, setId: number, weight: string | number | null = null, reps: string | number | null = null) => {
+    console.log('update session: ', exerciseId, setId, weight, reps);
+    const sessionCopy: any = { ...currentSession };
+    console.log('sessionCopy: ', JSON.stringify(sessionCopy));
+    if (reps) {
+      sessionCopy[exerciseId][setId].reps = reps;
+    }
+    if (weight) {
+      sessionCopy[exerciseId][setId].weight = weight;
+    }
+    console.log('sessionCopy update: ', sessionCopy);
+    // setCurrentSession(sessionCopy);
   }
+
+  const setInitialSetData = useCallback(() => {
+    const setsInitialData: any = {};
+    filteredExercises.forEach((exercise: any) => {
+      const sets = parseInt(exercise.sets);
+      const exerciseSets = range(sets).map((set) => ({ set, reps: exercise.reps, weight: 0, exerciseId: exercise.id }));
+      setsInitialData[exercise.id] = exerciseSets;
+    });
+    console.log('setinitialdata: ', setsInitialData);
+    setCurrentSession(setsInitialData);
+    setSessionState(sessionStateEnum.wip);
+    toast({
+      message: 'Starting Workout',
+      duration: 1500,
+      position: 'bottom'
+    });
+  }, [filteredExercises, setCurrentSession, toast]);
+
+  const finishWorkout = async () => {
+    const history = await get('history') || [];
+    console.log('Finish workout: ', currentSession);
+    const currentSessionData = {
+      id: sessionId,
+      workoutId: selectedWorkout,
+      data: currentSession,
+      createdAt: new Date()
+    }
+    const appendedHistory = [
+      ...history,
+      currentSessionData
+    ];
+    set('history', appendedHistory);
+    setSessionState(sessionStateEnum.finish);
+    toast({
+      message: 'Congratulations!',
+      duration: 2500,
+      position: 'bottom'
+    });
+  }
+
+  const confirmStart = useCallback(() => {
+    presentAlert({
+      header: 'Do you want to start this workout?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {},
+        },
+        {
+          text: 'Yes',
+          role: 'confirm',
+          handler: () => {
+            setInitialSetData();
+          },
+        },
+      ],
+      // onDidDismiss: (e: CustomEvent) => setRoleMessage(`Dismissed with role: ${e.detail.role}`),
+    })
+  }, [presentAlert, setInitialSetData]);
 
   useEffect(() => {
-    fetchWorkoutData();
+    fn();
   }, []);
+  // console.log('all Data', workoutData, exerciseData);
 
-  const saveSetWeight = (exerciseId: string, setId: any, setWeight: any, reps: string) => {
-    console.log('Save weight: ', exerciseId, setId, setWeight, reps);
-    setWorkoutRecord((workoutRecord) => {
-      const { exercise = [] } = workoutRecord || {};
-      const alreadyExists = exercise.some((ex) => ex.id === exerciseId && ex.setId === setId);
-      let exerciseData = [];
-      if (!alreadyExists) {
-        exerciseData = [...exercise, {
-          id: exerciseId,
-          setId,
-          weight: setWeight,
-          reps,
-        }];
-      } else {
-        exerciseData = exercise.map((ex) => {
-          if (ex.id === exerciseId && ex.setId === setId) {
-            return {
-              ...ex,
-              weight: setWeight,
-              reps: reps
-            }
-          }
-          return ex;
-        })
-      }
-
-      const workoutRecordData = {
-        workoutId: selectedWorkout,
-        creationDate: new Date(),
-        exercise: exerciseData
-      };
-
-      // setAllWorkoutRecord([...allWorkoutRecord || [], workoutRecordData]);
-      return workoutRecordData;
-    })
-  }
-
-  const recordWorkout = async () => {
-    await set('workoutRecords', [...allWorkoutRecord || [],
-      workoutRecord
-    ]);
-  }
+  useEffect(() => {
+    if(selectedWorkout) {
+      confirmStart();
+    }
+  }, [selectedWorkout, confirmStart]);
 
   return (
-    <div>
-      <IonList>
-        <IonItem>
-          <IonSelect interface="action-sheet" placeholder="Select Workout"
-            onIonChange={(e) => setSelectedWorkout(e.detail.value)}
-          >
-            {workouts.map((workout: any) => {
-              return (<div key={workout.id}>
-                <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
-              </div>);
-            })}
-          </IonSelect>
-          {/* <IonSelect interface="action-sheet" placeholder="Select Exercise"
-          onIonChange={(e) =>  setSelectedWorkout(e.detail.value)}
-          >
-            {filteredExercises.map((exercise: any) => {
-              return (<div key={exercise.id}>
-                <IonSelectOption value={exercise.id}>{exercise.name}</IonSelectOption>
-              </div>);
-            })}
-          </IonSelect> */}
-        </IonItem>
-      </IonList>
-      <IonGrid>
-        <IonRow>
-          <IonCol col-4>
-            <IonLabel >Name</IonLabel>
-          </IonCol>
-          <IonCol col-4>
-            <IonLabel >Weight</IonLabel>
-          </IonCol>
-          <IonCol col-4>
-            <IonLabel >Reps</IonLabel>
-          </IonCol>
-        </IonRow>
-        {
-          filteredExercises.map((exercise: any) => {
-            console.log('filtered exercise: ', filteredExercises);
-            return (
-              <IonAccordionGroup>
-                <IonAccordion value="first">
-                  <IonItem slot="header" color="light">
-                    <IonLabel>{exercise.name}</IonLabel>
-                  </IonItem>
-                  <div className="ion-padding" slot="content">
-                    {/* First Content */}
-                    {
-                      [...Array(Number(exercise.sets))].map((_, index) => (
-                        <IonRow>
-                          <IonCol col-4>
-                            <IonLabel>Set {index + 1}</IonLabel>
-                          </IonCol>
-                          <IonCol col-4>
-                            <IonLabel>
-                              <IonInput
-                                // value={exerciseName}
-                                placeholder="Weight for the set"
-                                min="1"
-                                max="1000"
-                                type="number"
-                                inputmode="numeric"
-                                onIonBlur={e => saveSetWeight(exercise.id, index, e.target.value!, exercise.reps)}
-                                clearInput>
-                              </IonInput>
+    <IonContent className="ion-padding">
+      <IonSelect interface="action-sheet" placeholder="Select Workout"
+        onIonChange={(e) => {
+          setSelectedWorkout(e.detail.value);
+          filterExercise(e.detail.value);
+          // if (e?.detail?.value && filteredEx.length) {
+          //   createSession(e.detail.value, filteredEx);
+          // }
+        }}
+      >
+        {workoutData.map((workout: any) => {
+          return (<div key={workout.id}>
+            <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
+          </div>);
+        })}
+      </IonSelect>
 
-                            </IonLabel>
-                          </IonCol>
-                          <IonCol col-4>
-                            <IonLabel>{exercise.reps}</IonLabel>
-                          </IonCol>
-                        </IonRow>
-                      ))
-                    }
-                  </div>
-                </IonAccordion>
-              </IonAccordionGroup>
+      {filteredExercises.map((exercise: any) => (
+        <IonAccordionGroup>
+          <IonAccordion value="first">
+            <IonItem slot="header" color="light">
+              <IonLabel>{exercise.name}</IonLabel>
+            </IonItem>
+            <div className="ion-padding" slot="content">
+              {/* First Content */}
+              {
+                [...Array(Number(exercise.sets))].map((_, index) => (
+                  <IonRow>
+                    <IonCol col-4>
+                      <IonLabel>Set {index + 1}</IonLabel>
+                    </IonCol>
+                    <IonCol col-4>
+                      <IonLabel>
+                        <IonInput
+                          // value={exerciseName}
+                          placeholder="Weight"
+                          min="1"
+                          max="1000"
+                          type="number"
+                          inputmode="numeric"
+                          onIonBlur={e => updateCurrentSession(exercise.id, index, e.target.value!, null)}
+                          clearInput>
+                        </IonInput>
 
-            )
-          })
-        }
-      </IonGrid>
-      <IonButton onClick={recordWorkout}>Finish</IonButton>
-    </div>
+                      </IonLabel>
+                    </IonCol>
+                    <IonCol col-4>
+                      <IonLabel>
+                        <IonInput
+                          placeholder='Reps'
+                          min='0'
+                          max='1000'
+                          type='number'
+                          inputmode='numeric'
+                          onIonBlur={e => updateCurrentSession(exercise.id, index, null, e.target.value!)}
+                          clearInput
+                        >
+
+                        </IonInput>
+                        {/* {exercise.reps} */}
+                      </IonLabel>
+                    </IonCol>
+                  </IonRow>
+                ))
+              }
+            </div>
+          </IonAccordion>
+        </IonAccordionGroup>
+      ))
+      }
+
+      {!!selectedWorkout && sessionState === sessionStateEnum.start &&
+        < IonButton onClick={setInitialSetData}>
+          Start
+        </IonButton>
+      }
+      {!([sessionStateEnum.finish, sessionStateEnum.start].includes(sessionState)) &&
+        <IonButton onClick={finishWorkout}>
+          Finish
+        </IonButton>
+      }
+    </IonContent>
   );
 };
 
