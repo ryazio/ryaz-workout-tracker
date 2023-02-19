@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
-import { IonButton, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonButton, IonContent, IonInput, IonItem, IonList, IonSelect, IonSelectOption } from '@ionic/react';
 import { get, set } from '../data/ionicStorage';
 
 interface workout {
@@ -57,7 +57,7 @@ const CreateExercise = () => {
   }, [])
 
   return (
-    <div>
+    <IonContent className="ion-padding">
       <IonList>
         <IonItem>
           <IonSelect interface="action-sheet" placeholder="Select Workout"
@@ -71,7 +71,6 @@ const CreateExercise = () => {
           </IonSelect>
         </IonItem>
       </IonList>
-      <IonLabel>Exercise</IonLabel>
       <IonInput value={exerciseName} placeholder="Enter Exercise name" onIonChange={e => setExerciseName(e.detail.value!)} clearInput></IonInput>
       <IonInput value={exerciseSets} placeholder="Enter Sets" onIonChange={e => setExerciseSets(e.detail.value!)} clearInput></IonInput>
       <IonInput value={exerciseReps} placeholder="Enter Reps" onIonChange={e => setExerciseReps(e.detail.value!)} clearInput></IonInput>
@@ -79,7 +78,7 @@ const CreateExercise = () => {
       <div>
         {/* {workouts[0].name} */}
       </div>
-    </div>
+    </IonContent>
   );
 };
 

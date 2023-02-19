@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
-import { IonButton, IonInput } from '@ionic/react';
+import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonList, IonListHeader } from '@ionic/react';
 import { get, set } from '../data/ionicStorage';
 
 interface workout {
@@ -35,26 +35,28 @@ const CreateWorkout = () => {
   }, [])
 
   return (
-    <div>
-      <IonInput value={text} placeholder="Enter Workout Name" onIonChange={e => setText(e.detail.value!)} clearInput></IonInput>
+    <IonContent className="ion-padding">
+      <IonInput
+        value={text}
+        placeholder="Enter Workout Name like Chest, Legs"
+        onIonChange={e => setText(e.detail.value!)}
+        clearInput>
+      </IonInput>
       <IonButton onClick={storeWorkout}>Save</IonButton>
-      <div>
-        {/* {workouts.map((workout: any) => {
-        <div key={workout.name}>
-          {workout.name}
-        </div>
-      })} */}
-        {/* {workouts[0].name} */}
+      <IonList>
+      <IonListHeader>
+        <IonLabel>Existing Workouts</IonLabel>
+      </IonListHeader>
         {
           workouts.map((workout) => (
-            <div key={workout.id}>
-              {workout.name}
-            </div>
+            <IonItem key={workout.id}>
+              <IonLabel>{workout.name}</IonLabel>
+            </IonItem>
           )
           )
         }
-      </div>
-    </div>
+      </IonList>
+    </IonContent>
   );
 };
 

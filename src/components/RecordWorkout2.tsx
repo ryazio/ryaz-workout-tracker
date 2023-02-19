@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { get, set } from '../data/ionicStorage';
-import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonInput, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption, useIonAlert, useIonToast } from '@ionic/react';
+import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonContent, IonInput, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption, useIonAlert, useIonToast } from '@ionic/react';
 import range from 'lodash.range';
 
 interface SessionProps {
@@ -127,9 +127,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
   }, [selectedWorkout, confirmStart]);
 
   return (
-    <div>
-      <h1>Record Workout</h1>
-
+    <IonContent className="ion-padding">
       <IonSelect interface="action-sheet" placeholder="Select Workout"
         onIonChange={(e) => {
           setSelectedWorkout(e.detail.value);
@@ -210,7 +208,7 @@ const RecordWorkout2: React.FC<SessionProps> = (props: SessionProps) => {
           Finish
         </IonButton>
       }
-    </div>
+    </IonContent>
   );
 };
 

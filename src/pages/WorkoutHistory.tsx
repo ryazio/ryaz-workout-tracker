@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { get } from '../data/ionicStorage';
-import { IonAccordion, IonAccordionGroup, IonItem, IonLabel } from '@ionic/react';
+import { IonAccordion, IonAccordionGroup, IonContent, IonItem, IonLabel } from '@ionic/react';
 
 
 interface WorkoutHistoryProps {}
@@ -16,7 +16,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
     loadData();
   }, []);
   return (
-    <div>
+    <IonContent className="ion-padding">
       {historyData.length && historyData.map((workout: any) => (
         <IonAccordionGroup key={workout.id}>
           <IonAccordion value="first" >
@@ -29,7 +29,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
           </IonAccordion>
         </IonAccordionGroup>
       ))}
-    </div>
+    </IonContent>
   );
 };
 
