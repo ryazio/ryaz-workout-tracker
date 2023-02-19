@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { get } from '../data/ionicStorage';
-import { IonAccordion, IonAccordionGroup, IonContent, IonItem, IonLabel } from '@ionic/react';
+import { IonAccordion, IonAccordionGroup, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonList, IonListHeader, IonRow } from '@ionic/react';
 
 
 interface WorkoutHistoryProps {}
@@ -17,18 +17,44 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
   }, []);
   return (
     <IonContent className="ion-padding">
-      {historyData.length && historyData.map((workout: any) => (
+      {historyData.length && historyData.map((workout: any) => {
+        const { workoutId, createdAt, data } = workout;
+        return (
         <IonAccordionGroup key={workout.id}>
           <IonAccordion value="first" >
             <IonItem slot="header" color="light">
-              <IonLabel>{workout.createdAt.toString()}</IonLabel>
+              <IonLabel>{workoutId} - {workout.createdAt.toString()}</IonLabel>
             </IonItem>
-            <div className="ion-padding" slot="content">
-              {JSON.stringify(workout.data)}
-            </div>
+            <IonCard slot="content">
+              <IonCardHeader>
+                <IonCardTitle>{workoutId}</IonCardTitle>
+                <IonCardSubtitle>{createdAt.toString()}</IonCardSubtitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <IonList>
+                  {Object.keys(data).map((sessionExercise: string) => (
+                    <IonGrid key={sessionExercise}>
+                      <IonListHeader>{sessionExercise}</IonListHeader>
+                      <IonRow>
+                        <IonCol>Set</IonCol>
+                        <IonCol>Weight</IonCol>
+                        <IonCol>Reps</IonCol>
+                      </IonRow>
+                      {data[sessionExercise].map((ex:any) =>(
+                        <IonRow key={ex.set}>
+                          <IonCol>{ex.set}</IonCol>
+                          <IonCol>{ex.weight}</IonCol>
+                          <IonCol>{ex.reps}</IonCol>
+                        </IonRow>
+                      ))}
+                    </IonGrid>
+                  ))}
+                </IonList>
+              </IonCardContent>
+            </IonCard>
           </IonAccordion>
         </IonAccordionGroup>
-      ))}
+      )})}
     </IonContent>
   );
 };
