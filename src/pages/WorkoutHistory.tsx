@@ -7,9 +7,23 @@ import { IonAccordion, IonAccordionGroup, IonCard, IonCardContent, IonCardHeader
 interface WorkoutHistoryProps {}
 
 const WorkoutHistory = (props: WorkoutHistoryProps) => {
+  const [workoutData, setWorkoutData] = useState([]);
+  const [exerciseData, setExerciseData] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const loadData = async() => {
+    setWorkoutData(await get('workouts') || []);
+    setExerciseData(await get('exercises') || []);
     setHistoryData(await get('history') || []);
+  }
+
+  const getWorkoutNameById = (id: string) => {
+    const workoutObj = workoutData.find((workout: any) => workout.id === id) || { name: ''};
+    return workoutObj.name;
+  };
+
+  const getExerciseNameById = (id: string) => {
+    const exerciseObj = exerciseData.find((exercise: any) => exercise.id == id) || { name: ''};
+    return exerciseObj.name; 
   }
 
   useEffect(() => {
@@ -19,22 +33,23 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
     <IonContent className="ion-padding">
       {historyData.length && historyData.map((workout: any) => {
         const { workoutId, createdAt, data } = workout;
+        const workoutName = getWorkoutNameById(workoutId);
         return (
         <IonAccordionGroup key={workout.id}>
           <IonAccordion value="first" >
             <IonItem slot="header" color="light">
-              <IonLabel>{workoutId} - {workout.createdAt.toString()}</IonLabel>
+              <IonLabel>{workoutName} - {workout.createdAt.toString()}</IonLabel>
             </IonItem>
             <IonCard slot="content">
               <IonCardHeader>
-                <IonCardTitle>{workoutId}</IonCardTitle>
+                <IonCardTitle>{workoutName}</IonCardTitle>
                 <IonCardSubtitle>{createdAt.toString()}</IonCardSubtitle>
               </IonCardHeader>
               <IonCardContent>
                 <IonList>
                   {Object.keys(data).map((sessionExercise: string) => (
                     <IonGrid key={sessionExercise}>
-                      <IonListHeader>{sessionExercise}</IonListHeader>
+                      <IonListHeader>{getExerciseNameById(sessionExercise)}</IonListHeader>
                       <IonRow>
                         <IonCol>Set</IonCol>
                         <IonCol>Weight</IonCol>
