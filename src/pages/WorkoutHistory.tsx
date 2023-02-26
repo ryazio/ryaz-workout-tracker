@@ -22,7 +22,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
 
   const getWorkoutNameById = (id: string) => {
     const workoutObj = workoutData.find((workout: any) => workout.id === id) || { name: ''};
-    return workoutObj.name;
+    return workoutObj.name || "[Deleted Workout]";
   };
 
   const getExerciseNameById = (id: string) => {
