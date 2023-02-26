@@ -71,7 +71,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
                       </IonRow>
                       {data[sessionExercise].map((ex:any) =>(
                         <IonRow key={ex.set}>
-                          <IonCol>{ex.set}</IonCol>
+                          <IonCol>{Number(ex.set) + 1}</IonCol>
                           <IonCol>{ex.weight}</IonCol>
                           <IonCol>{ex.reps}</IonCol>
                         </IonRow>
