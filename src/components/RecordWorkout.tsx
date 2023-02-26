@@ -20,8 +20,6 @@ const RecordWorkout: React.FC<SessionProps> = (props: SessionProps) => {
   const [presentAlert] = useIonAlert();
   // const [roleMessage, setRoleMessage] = useState('');
 
-
-  console.log('props: ', props);
   const { currentSession, setCurrentSession } = props;
   const [workoutData, setWorkoutData] = useState([]);
   const [exerciseData, setExerciseData] = useState([]);
@@ -137,15 +135,15 @@ const RecordWorkout: React.FC<SessionProps> = (props: SessionProps) => {
           // }
         }}
       >
-        {workoutData.map((workout: any) => {
-          return (<div key={workout.id}>
+        {workoutData.map((workout: any) => (
+          <div key={workout.id}>
             <IonSelectOption value={workout.id}>{workout.name}</IonSelectOption>
-          </div>);
-        })}
+          </div>
+        ))}
       </IonSelect>
 
       {filteredExercises.map((exercise: any) => (
-        <IonAccordionGroup>
+        <IonAccordionGroup key={exercise.id}>
           <IonAccordion value="first">
             <IonItem slot="header" color="light">
               <IonLabel>{exercise.name}</IonLabel>
@@ -154,7 +152,7 @@ const RecordWorkout: React.FC<SessionProps> = (props: SessionProps) => {
               {/* First Content */}
               {
                 [...Array(Number(exercise.sets))].map((_, index) => (
-                  <IonRow>
+                  <IonRow key={index}>
                     <IonCol col-4>
                       <IonLabel>Set {index + 1}</IonLabel>
                     </IonCol>

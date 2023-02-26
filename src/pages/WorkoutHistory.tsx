@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 // import PropTypes from 'prop-types';
 import { get } from '../data/ionicStorage';
-import { IonAccordion, IonAccordionGroup, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonList, IonListHeader, IonRow } from '@ionic/react';
+import {
+  IonAccordion, IonAccordionGroup, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle,
+  IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonList, IonListHeader,
+  IonRefresher, IonRefresherContent, IonRow, RefresherEventDetail 
+} from '@ionic/react';
 
 
 interface WorkoutHistoryProps {}
@@ -18,7 +22,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
 
   const getWorkoutNameById = (id: string) => {
     const workoutObj = workoutData.find((workout: any) => workout.id === id) || { name: ''};
-    return workoutObj.name;
+    return workoutObj.name || "[Deleted Workout]";
   };
 
   const getExerciseNameById = (id: string) => {
@@ -26,12 +30,22 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
     return exerciseObj.name; 
   }
 
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    setTimeout(() => {
+      loadData();
+      event.detail.complete();
+    }, 2000);
+  }
+
   useEffect(() => {
     loadData();
   }, []);
   return (
     <IonContent className="ion-padding">
-      {historyData.length && historyData.map((workout: any) => {
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresherContent></IonRefresherContent>
+      </IonRefresher>
+      {!!historyData.length && historyData.map((workout: any) => {
         const { workoutId, createdAt, data } = workout;
         const workoutName = getWorkoutNameById(workoutId);
         return (
@@ -57,7 +71,7 @@ const WorkoutHistory = (props: WorkoutHistoryProps) => {
                       </IonRow>
                       {data[sessionExercise].map((ex:any) =>(
                         <IonRow key={ex.set}>
-                          <IonCol>{ex.set}</IonCol>
+                          <IonCol>{Number(ex.set) + 1}</IonCol>
                           <IonCol>{ex.weight}</IonCol>
                           <IonCol>{ex.reps}</IonCol>
                         </IonRow>
